@@ -51,4 +51,5 @@ resource "unifi_port_forward" "UniFi_Port_Forward" {
   fwd_port = each.value.fwd_port
   protocol = each.value.protocol
   log      = each.value.log
+  enabled  = each.value.enabled
 }

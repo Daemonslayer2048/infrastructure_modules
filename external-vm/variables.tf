@@ -20,14 +20,6 @@ variable "unifi-network-name" {
   type        = string
 }
 
-# This is claimed to be deprecated, however, failing to
-# include this will result in it being disabled.
-variable "enabled" {
-  description = "To enable to rule or not"
-  type = bool
-  default = true
-}
-
 variable "unifi-note" {
   description = "A note in the unifi UI for a client."
   type        = string
@@ -40,6 +32,7 @@ variable "port_forwards" {
       dst_port = string
       fwd_port = string
       protocol = string
+      enabled  = bool
       log      = bool
   }))
 }
