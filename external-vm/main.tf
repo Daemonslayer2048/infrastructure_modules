@@ -13,6 +13,7 @@ resource "proxmox_vm_qemu" "Proxmox_VM" {
   ipconfig0    = "gw=${var.gateway},ip=${var.network}.${var.vm-id}/${var.network_subnet}"
   nameserver   = var.nameservers
   searchdomain = var.searchdomain
+  pool         = var.pool
   agent        = 1
   network {
     model     = var.net0-model

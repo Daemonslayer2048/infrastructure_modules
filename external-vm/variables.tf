@@ -89,6 +89,11 @@ variable "tags" {
   type        = string
 }
 
+variable "pool" {
+  description = "The pool to add the VM to"
+  type        = string
+}
+
 variable "mem" {
   description = "The total memory (in MB) to give the VM"
   type        = number
