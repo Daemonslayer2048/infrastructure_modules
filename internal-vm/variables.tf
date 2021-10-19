@@ -34,17 +34,6 @@ variable "unifi-note" {
   default     = "A VM made by terragrunt"
 }
 
-variable "port_forwards" {
-  type = list(object({
-      name     = string
-      dst_port = string
-      fwd_port = string
-      protocol = string
-      enabled  = bool
-      log      = bool
-  }))
-}
-
 ########################################################
 # Proxmox Related
 variable "proxmox" {

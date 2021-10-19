@@ -89,35 +89,6 @@ variable "unifi" {
 }
 ```
 
-__Port Forward Object:__  
-This is a list of rules to add to the UniFi firewall for port forwarding. A good example is a http/s reverse proxy, which would use the following yaml to create the rules needed:
-``` yaml
-port_forwards:
-  - name: "Test Caddy Proxy Port 80"
-    dst_port: "80"
-    fwd_port: "80"
-    protocol: "tcp_udp"
-    log: true
-  - name: "Test Caddy Proxy Port 4443"
-    dst_port: "443"
-    fwd_port: "443"
-    protocol: "tcp_udp"
-    log: true
-```
-This will log the traffic hits and assign the port forward destination IP to the VM created with this module.
-
-``` terraform
-variable "port_forwards" {
-  type = list(object({
-      name     = string
-      dst_port = string
-      fwd_port = string
-      protocol = string
-      log      = bool
-  }))
-}
-```
-
 #### Basic Variables
 | Key | Type | Required | Default | Description |
 |  -  |   -   |     -    |    -    |      -     |

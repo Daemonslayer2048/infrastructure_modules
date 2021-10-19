@@ -1,56 +1,71 @@
-resource "proxmox_vm_qemu" "Proxmox_VM" {
-  name         = var.vm-name
-  target_node  = var.node
-  vmid         = var.vm-id
-  desc         = var.desc
-  tags         = var.tags
-  clone        = var.template-name
-  memory       = var.mem
-  cores        = var.cpu
-  ciuser       = var.cloud_init.user
-  cipassword   = var.cloud_init.pass
-  sshkeys      = var.cloud_init.ssh_keys
-  ipconfig0    = "gw=${var.gateway},ip=${var.network}.${var.vm-id}/${var.network_subnet}"
-  nameserver   = var.nameservers
-  searchdomain = var.searchdomain
-  pool         = var.pool
-  agent        = 1
-  network {
-    model     = var.net0-model
-    bridge    = var.net0-bridge
-    tag       = var.net0-tag
-    firewall  = var.net0-firewall
-    link_down = var.net0-link-down
-  }
-  disk {
-    size      = var.disk0-size
-    type      = var.disk0-type
-    storage   = var.disk0-storage
-    backup    = var.disk0-backup
-    replicate = var.disk0-replicate
-  }
-  lifecycle {
-    ignore_changes = [
-      network
-    ]
-  }
+provider "proxmox" {
+  pm_api_url      = var.proxmox.url
+  pm_user         = var.proxmox.user
+  pm_password     = var.proxmox.pass
+  pm_tls_insecure = true
 }
 
-resource "unifi_user" "UniFi_User" {
-  mac        = "${proxmox_vm_qemu.Proxmox_VM.network[0].macaddr}"
-  name       = "${var.vm-name}.${var.searchdomain}"
-  note       = var.unifi-note
-  fixed_ip   = "${var.network}.${var.vm-id}"
-  network_id = "${data.unifi_network.lan_network.id}"
+provider "unifi" {
+  username = var.unifi.user # optionally use UNIFI_USERNAME env var
+  password = var.unifi.pass # optionally use UNIFI_PASSWORD env var
+  api_url  = var.unifi.url  # optionally use UNIFI_API env var
+  allow_insecure = true
 }
 
-resource "unifi_port_forward" "UniFi_Port_Forward" {
-  for_each = {for rule in var.port_forwards:  rule.name => rule}
-  name     = each.value.name
-  dst_port = each.value.dst_port
-  fwd_ip   = "${var.network}.${var.vm-id}"
-  fwd_port = each.value.fwd_port
-  protocol = each.value.protocol
-  log      = each.value.log
-  enabled  = each.value.enabled
+module "Proxmox_VM" {
+  # Source Module
+  source = "../root_modules//proxmox_vm"
+  # Proxmox Provider
+  proxmox = var.proxmox
+  # VM Data
+  vm-name         = var.vm-name
+  node            = var.node
+  vm-id           = var.vm-id
+  desc            = var.desc
+  tags            = var.tags
+  template-name   = var.template-name
+  mem             = var.mem
+  cpu             = var.cpu
+  cloud_init      = var.cloud_init
+  gateway         = var.gateway
+  network         = var.network
+  network_subnet  = var.network_subnet
+  nameservers     = var.nameservers
+  searchdomain    = var.searchdomain
+  pool            = var.pool
+  net0-model      = var.net0-model
+  net0-bridge     = var.net0-bridge
+  net0-tag        = var.net0-tag
+  net0-firewall   = var.net0-firewall
+  net0-link-down  = var.net0-link-down
+  disk0-size      = var.disk0-size
+  disk0-type      = var.disk0-type
+  disk0-storage   = var.disk0-storage
+  disk0-backup    = var.disk0-backup
+  disk0-replicate = var.disk0-replicate
+}
+
+module "UniFi_Client" {
+  # Source Module
+  source             = "../root_modules//unifi_client"
+  # Proxmox Provider
+  unifi              = var.unifi
+  # UnifClient Data
+  name               = "${var.vm-name}.${var.searchdomain}"
+  mac                = module.Proxmox_VM.mac
+  unifi-note         = var.unifi-note
+  fixed_ip           = "${var.network}.${var.vm-id}"
+  unifi-network-name = var.unifi-network-name
+  # Dependencies
+  depends_on         = [module.Proxmox_VM.mac]
+}
+
+module "UniFi_Port_Forward_Rules" {
+  # Source Module
+  source        = "../root_modules//unifi_portforwards"
+  # Proxmox Provider
+  unifi         = var.unifi
+  # Rules
+  fixed_ip      = "${var.network}.${var.vm-id}"
+  port_forwards = var.port_forwards
 }

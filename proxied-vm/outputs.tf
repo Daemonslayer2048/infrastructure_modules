@@ -1,17 +1,17 @@
 output "tags" {
-  value = proxmox_vm_qemu.Proxmox_VM.tags
+  value = var.tags
 }
 
 output "ip" {
-  value = proxmox_vm_qemu.Proxmox_VM.ssh_host
+  value = module.Proxmox_VM.ip
 }
 
 output "mac" {
-  value = proxmox_vm_qemu.Proxmox_VM.network[0].macaddr
+  value = module.Proxmox_VM.mac
 }
 
 output "hostname" {
-  value = proxmox_vm_qemu.Proxmox_VM.name
+  value = module.Proxmox_VM.hostname
 }
 
 output "domain" {
