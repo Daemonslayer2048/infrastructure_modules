@@ -8,28 +8,45 @@ __NOTE:__ I have opted for a funky system of setting IPs. I have a preference fo
 The following will be output by this module:  
 ``` json
 {
-  "host_net": {
+  "ansible_host": {
     "sensitive": false,
     "type": [
       "object",
       {
         "domain": "string",
-        "host_name": "string",
+        "hostname": "string",
         "ip": "string",
-        "mac": "string"
+        "mac": "string",
+        "nameserver": "string",
+        "tags": [
+          "list",
+          [
+            "object",
+            {
+              "key": "string",
+              "value": "string"
+            }
+          ]
+        ]
       }
     ],
     "value": {
-      "domain": "null.com",
-      "host_name": "test",
-      "ip": "192.168.1.52",
-      "mac": "56:BC:8F:59:0C:69"
+      "domain": "infra.lan",
+      "hostname": "murmur",
+      "ip": "192.168.0.208",
+      "mac": "72:9D:A5:13:39:47",
+      "nameserver": "192.168.0.2 192.168.0.3",
+      "tags": [
+        {
+          "key": "role",
+          "value": "Mumble"
+        },
+        {
+          "key": "timezone",
+          "value": "America/Alaska"
+        }
+      ]
     }
-  },
-  "tags": {
-    "sensitive": false,
-    "type": "string",
-    "value": "Hass"
   }
 }
 ```
@@ -53,12 +70,9 @@ terraform {
 
 ----
 ## Variables
-### Namecheap
-#### Summary
-
-#### Objects
 ### UniFi
 #### Summary
+Used to add the list of port forward rules and add the VM as a client.
 
 #### Objects
 __UniFi Object:__  
@@ -112,6 +126,33 @@ variable "port_forwards" {
 
 ### Proxmox
 #### Summary
+#### Variables
+| Key | Type | Required | Default | Description |
+|  -  |   -   |     -    |    -    |      -     |
+| node | string | Y | N/A | The node to add the VM to |
+| template-name | string | N | "CentOS-Stream-Template" | The template the VM will be made from |
+| vm-name | string | Y | N/A | The name you will see in the Proxmox and UniFi UI |
+| vm-id | number | Y | N/A | The VM ID in the Proxmox UI |
+| desc | string | N | "Default description as created by terragrunt and terraform." | The decritpion for the VM (supports markdown) |
+| tags | list(dict) | Y | N/A | Adds a list of tags to the output, at least on item is required. |
+| mem | number | N | 2048 | The total memory (in MB) to give the VM |
+| cpu | number | N | 4 | The number of vCPUs to give the VM |
+| disk0-size | string | N | "100G" | The disk size to give the VM (a string not int) |
+| disk0-type | string | N | "scsi" | The disk connection type |
+| disk0-storage | string | N | "local-zfs" | Proxmox storage array to use |
+| disk0-backup | number | N | 1 | A bollean to decide if the disk should be backed up (1 is true) |
+| disk0-replicate | number | N | 1 | A bollean to decide if the disk should be added to replication jobs (1 is true) |
+| gateway | string | Y | N/A | The gateway for the VMs network |
+| network | string | Y | N/A | The gateway for the VMs network |
+| network_subnet | string | Y | N/A | The first three octets of the network (i.e. 10.0.0 or 192.168.0) |
+| nameservers | string | N | "10.0.0.2, 10.0.0.3" | Nameservers to set for VMs |
+| searchdomain | string | N | "infra.lan" | Search domain to set for VMs |
+| net0-model | string | N | "virtio" | The device model to use |
+| net0-bridge | string | N | "vmbr0" | The bridge name to attach the net device to |
+| net0-tag | string | N | "-1" | The VLAN tag to use |
+| net0-firewall | string | N | false | To enable proxmox firewall or not |
+| net0-link-down | bool | N | false | To enable or disable the network device |
+
 #### Objects
 __Proxmox Object:__  
 
@@ -146,30 +187,3 @@ variable "cloud_init" {
   })
 }
 ```
-
-#### Basic Variables
-| Key | Type | Required | Default | Description |
-|  -  |   -   |     -    |    -    |      -     |
-| node | string | Y | N/A | The node to add the VM to |
-| template-name | string | N | "CentOS-Stream-Template" | The template the VM will be made from |
-| vm-name | string | Y | N/A | The name you will see in the Proxmox and UniFi UI |
-| vm-id | number | Y | N/A | The VM ID in the Proxmox UI |
-| desc | string | N | "Default description as created by terragrunt and terraform." | The decritpion for the VM (supports markdown) |
-| tags | string | Y | N/A | Tag in Proxmox to apply |
-| mem | number | N | 2048 | The total memory (in MB) to give the VM |
-| cpu | number | N | 4 | The number of vCPUs to give the VM |
-| disk0-size | string | N | "100G" | The disk size to give the VM (a string not int) |
-| disk0-type | string | N | "scsi" | The disk connection type |
-| disk0-storage | string | N | "local-zfs" | Proxmox storage array to use |
-| disk0-backup | number | N | 1 | A bollean to decide if the disk should be backed up (1 is true) |
-| disk0-replicate | number | N | 1 | A bollean to decide if the disk should be added to replication jobs (1 is true) |
-| gateway | string | Y | N/A | The gateway for the VMs network |
-| network | string | Y | N/A | The gateway for the VMs network |
-| network_subnet | string | Y | N/A | The first three octets of the network (i.e. 10.0.0 or 192.168.0) |
-| nameservers | string | N | "10.0.0.2, 10.0.0.3" | Nameservers to set for VMs |
-| searchdomain | string | N | "infra.lan" | Search domain to set for VMs |
-| net0-model | string | N | "virtio" | The device model to use |
-| net0-bridge | string | N | "vmbr0" | The bridge name to attach the net device to |
-| net0-tag | string | N | "-1" | The VLAN tag to use |
-| net0-firewall | string | N | false | To enable proxmox firewall or not |
-| net0-link-down | bool | N | false | To enable or disable the network device |

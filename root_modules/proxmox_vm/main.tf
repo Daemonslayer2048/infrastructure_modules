@@ -3,7 +3,6 @@ resource "proxmox_vm_qemu" "Proxmox_VM" {
   target_node  = var.node
   vmid         = var.vm-id
   desc         = var.desc
-  tags         = var.tags
   clone        = var.template-name
   memory       = var.mem
   cores        = var.cpu

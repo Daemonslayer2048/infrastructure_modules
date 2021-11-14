@@ -45,11 +45,6 @@ variable "desc" {
   EOT
 }
 
-variable "tags" {
-  description = "The tags to add to the VM"
-  type        = string
-}
-
 variable "pool" {
   description = "The pool to add the VM to"
   type        = string

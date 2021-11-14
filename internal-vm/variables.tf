@@ -1,4 +1,13 @@
 ########################################################
+# Ansible Host Tags
+variable "tags" {
+  type = list(object({
+      key   = string
+      value = string
+  }))
+}
+
+########################################################
 # Unifi Related
 variable "unifi" {
   type = object({
@@ -79,11 +88,6 @@ variable "desc" {
   default     = <<-EOT
   Default description as created by terragrunt and terraform.
   EOT
-}
-
-variable "tags" {
-  description = "The tags to add to the VM"
-  type        = string
 }
 
 variable "pool" {

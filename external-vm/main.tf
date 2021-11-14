@@ -22,7 +22,6 @@ module "Proxmox_VM" {
   node            = var.node
   vm-id           = var.vm-id
   desc            = var.desc
-  tags            = var.tags
   template-name   = var.template-name
   mem             = var.mem
   cpu             = var.cpu

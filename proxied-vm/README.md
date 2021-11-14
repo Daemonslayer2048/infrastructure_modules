@@ -8,28 +8,45 @@ __NOTE:__ I have opted for a funky system of setting IPs. I have a preference fo
 The following will be output by this module:  
 ``` json
 {
-  "host_net": {
+  "ansible_host": {
     "sensitive": false,
     "type": [
       "object",
       {
         "domain": "string",
-        "host_name": "string",
+        "hostname": "string",
         "ip": "string",
-        "mac": "string"
+        "mac": "string",
+        "nameserver": "string",
+        "tags": [
+          "list",
+          [
+            "object",
+            {
+              "key": "string",
+              "value": "string"
+            }
+          ]
+        ]
       }
     ],
     "value": {
-      "domain": "null.com",
-      "host_name": "test",
-      "ip": "192.168.1.52",
-      "mac": "56:BC:8F:59:0C:69"
+      "domain": "infra.lan",
+      "hostname": "murmur",
+      "ip": "192.168.0.208",
+      "mac": "72:9D:A5:13:39:47",
+      "nameserver": "192.168.0.2 192.168.0.3",
+      "tags": [
+        {
+          "key": "role",
+          "value": "Mumble"
+        },
+        {
+          "key": "timezone",
+          "value": "America/Alaska"
+        }
+      ]
     }
-  },
-  "tags": {
-    "sensitive": false,
-    "type": "string",
-    "value": "Hass"
   }
 }
 ```

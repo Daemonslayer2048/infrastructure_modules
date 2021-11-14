@@ -12,6 +12,13 @@ provider "unifi" {
   allow_insecure = true
 }
 
+provider "namecheap" {
+  user_name   = var.namecheap.user
+  api_user    = var.namecheap.api-user
+  api_key     = var.namecheap.api-key
+  client_ip   = var.namecheap.client-ip
+  use_sandbox = var.namecheap.sandbox
+}
 
 module "Proxmox_VM" {
   # Source Module
@@ -58,4 +65,23 @@ module "UniFi_Client" {
   unifi-network-name = var.unifi-network-name
   # Dependencies
   depends_on         = [module.Proxmox_VM.mac]
+}
+
+module "UniFi_Port_Forward_Rules" {
+  # Source Module
+  source        = "../root_modules//unifi_portforwards"
+  # Proxmox Provider
+  unifi         = var.unifi
+  # Rules
+  fixed_ip      = "${var.network}.${var.vm-id}"
+  port_forwards = var.port_forwards
+}
+
+module "Namecheap_Record" {
+  # Source Module
+  source    = "../root_modules//namecheap_records"
+  # Proxmox Provider
+  namecheap = var.namecheap
+  # Record Data
+  vm-name   = var.vm-name
 }

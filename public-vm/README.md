@@ -1,5 +1,5 @@
 ## Summary
-This terraform module uses both UniFI, and Proxmox. The VM will be created on the node specified, and add the VM to UniFI as a client (with a static IP).
+This terraform module uses both UniFI, Proxmox, and Namecheap. The VM will be created on the node specified, add the VM to UniFI as a client (with a static IP), add an A record pointing to the public IP specified, and will add a list of port forwarding rules to the UniFi firewall.
 
 __NOTE:__ I have opted for a funky system of setting IPs. I have a preference for VM IDs to be part of the IP. For example a VM with an ID of 200 in a network like 192.168.0.0/24, will have an IP of 192.168.0.200. This limits the number of VMs available to 254, as the VM ID takes the last octet.
 
@@ -74,6 +74,20 @@ terraform {
 #### Summary
 
 #### Objects
+__Namecheap Object:__  
+This object is only used for authentication with the exception of the sandbox option.
+``` terraform
+variable "namecheap" {
+  type = object({
+    user      = string
+    api-user  = string
+    api-key   = string
+    client-ip = string
+    domain    = string
+    sandbox   = bool
+  })
+}
+```
 
 ### UniFi
 #### Summary
@@ -89,6 +103,35 @@ variable "unifi" {
     pass = string
     url  = string
   })
+}
+```
+
+__Port Forward Object:__  
+This is a list of rules to add to the UniFi firewall for port forwarding. A good example is a http/s reverse proxy, which would use the following yaml to create the rules needed:
+``` yaml
+port_forwards:
+  - name: "Test Caddy Proxy Port 80"
+    dst_port: "80"
+    fwd_port: "80"
+    protocol: "tcp_udp"
+    log: true
+  - name: "Test Caddy Proxy Port 4443"
+    dst_port: "443"
+    fwd_port: "443"
+    protocol: "tcp_udp"
+    log: true
+```
+This will log the traffic hits and assign the port forward destination IP to the VM created with this module.
+
+``` terraform
+variable "port_forwards" {
+  type = list(object({
+      name     = string
+      dst_port = string
+      fwd_port = string
+      protocol = string
+      log      = bool
+  }))
 }
 ```
 
