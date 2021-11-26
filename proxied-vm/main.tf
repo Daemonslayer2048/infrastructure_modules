@@ -28,16 +28,14 @@ module "Proxmox_VM" {
   # VM Data
   vm-name         = var.vm-name
   node            = var.node
-  vm-id           = var.vm-id
   desc            = var.desc
   template-name   = var.template-name
   mem             = var.mem
   cpu             = var.cpu
   cloud_init      = var.cloud_init
-  gateway         = var.gateway
-  network         = var.network
-  network_subnet  = var.network_subnet
+  ipconfig        = var.ipconfig
   nameservers     = var.nameservers
+  onboot          = var.onboot
   searchdomain    = var.searchdomain
   pool            = var.pool
   net0-model      = var.net0-model
@@ -59,12 +57,12 @@ module "UniFi_Client" {
   unifi              = var.unifi
   # UnifClient Data
   name               = "${var.vm-name}.${var.searchdomain}"
-  mac                = module.Proxmox_VM.mac
+  mac                = "${module.Proxmox_VM.mac}"
   unifi-note         = var.unifi-note
-  fixed_ip           = "${var.network}.${var.vm-id}"
+  fixed_ip           = "${module.Proxmox_VM.ip}"
   unifi-network-name = var.unifi-network-name
   # Dependencies
-  depends_on         = [module.Proxmox_VM.mac]
+  depends_on         = [module.Proxmox_VM.ip]
 }
 
 module "Namecheap_Record" {

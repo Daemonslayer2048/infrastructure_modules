@@ -1,7 +1,6 @@
 resource "proxmox_vm_qemu" "Proxmox_VM" {
   name         = var.vm-name
   target_node  = var.node
-  vmid         = var.vm-id
   desc         = var.desc
   clone        = var.template-name
   memory       = var.mem
@@ -9,10 +8,12 @@ resource "proxmox_vm_qemu" "Proxmox_VM" {
   ciuser       = var.cloud_init.user
   cipassword   = var.cloud_init.pass
   sshkeys      = var.cloud_init.ssh_keys
-  ipconfig0    = "gw=${var.gateway},ip=${var.network}.${var.vm-id}/${var.network_subnet}"
+  ipconfig0    = var.ipconfig
   nameserver   = var.nameservers
   searchdomain = var.searchdomain
   pool         = var.pool
+  tablet       = var.tablet
+  onboot       = var.onboot
   agent        = 1
   network {
     model     = var.net0-model

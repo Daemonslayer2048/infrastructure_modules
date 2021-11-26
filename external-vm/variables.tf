@@ -88,9 +88,16 @@ variable "vm-name" {
   type        = string
 }
 
+variable "onboot" {
+  description = "Start the VM when the node boots"
+  type        = bool
+  default     = true
+}
+
 variable "vm-id" {
   description = "The VM id to set, must be at least 3 digits"
   type        = number
+  default     = 0
 }
 
 variable "desc" {
@@ -148,19 +155,10 @@ variable "disk0-replicate" {
   default     = 1
 }
 
-variable "gateway" {
-  description = "The gateway for the VMs network"
+variable "ipconfig" {
+  description = "Sets the IP of the new VM, Example: gw=192.168.10.1,ip=192.168.10.2/24"
   type        = string
-}
-
-variable "network" {
-  description = "The first three octets of the network (i.e. 10.0.0 or 192.168.0)"
-  type        = string
-}
-
-variable "network_subnet" {
-  description = "The subnetmask (i.e /24)"
-  type        = string
+  default     = "ip=dhcp"
 }
 
 variable "nameservers" {
